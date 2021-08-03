@@ -16,7 +16,7 @@ const handleListen = () => console.log(`Listening on http://localhost:${port}`);
 const httpServer = http.createServer(app);
 const wsServer = SocketIo(httpServer);
 
-function publicRoom() {
+function publicRooms() {
   const {
     sockets: {
       adapter: { sids, rooms },
@@ -41,12 +41,16 @@ wsServer.on("connection", (socket) => {
     socket.join(roomName);
     done();
     socket.to(roomName).emit("welcome", socket.nickname);
+    wsServer.sockets.emit("room_change", publicRooms());
   });
 
   socket.on("disconnecting", () => {
     socket.rooms.forEach((room) =>
       socket.to(room).emit("bye", socket.nickname)
     );
+  });
+  socket.on("disconnect", () => {
+    wsServer.sockets.emit("room_change", publicRooms());
   });
 
   socket.on("new_message", (msg, room, done) => {
@@ -56,27 +60,5 @@ wsServer.on("connection", (socket) => {
 
   socket.on("nickname", (nickname) => (socket["nickname"] = nickname));
 });
-
-/* const sockets = [];
-
-wss.on("connection", (socket) => {
-  sockets.push(socket);
-  socket["nickname"] = "Anon";
-  console.log("Connected to Browser ✅");
-  socket.on("close", onSocketClose);
-  socket.on("message", (msg) => {
-    const message = JSON.parse(msg.toString("utf-8"));
-    switch (message.type) {
-      case "new_message":
-        sockets.forEach((aSocket) =>
-          aSocket.send(`${socket.nickname}: ${message.payload}`)
-        );
-        break;
-      case "nickname":
-        socket["nickname"] = message.payload;
-        break;
-    }
-  });
-}); */
 
 httpServer.listen(port, handleListen);
