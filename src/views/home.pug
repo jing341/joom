@@ -11,8 +11,9 @@ html(lang="en")
             h1 Joom
         main
             div#myStream
-                video#myFace(autoplay,playsinline, style="width:400px; height:400px; transform: rotateY(180deg); -webkit-transform:rotateY(180deg); -moz-transform:rotateY(180deg);")
+                video#myFace(autoplay, playsinline, muted, style="width:400px; height:400px; transform: rotateY(180deg); -webkit-transform:rotateY(180deg); -moz-transform:rotateY(180deg);")
                 button#mute Mute
                 button#camera Turn Camera Off
+                select#cameras() 
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/app.js")
